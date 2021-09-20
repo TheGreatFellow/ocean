@@ -4,6 +4,7 @@ import imagesLoaded from 'imagesloaded'
 import FontFaceObserver from 'fontfaceobserver'
 import vertex from './shaders/vertex.glsl'
 import fragment from './shaders/fragment.glsl'
+import { Scroll } from './scroll'
 import ocean from '../images/ocean.jpg'
 
 export default class Sketch {
@@ -55,15 +56,22 @@ export default class Sketch {
         })
 
         let allDone = [fontOpen, fontPlayfair, preloadImages]
+        this.currentScroll = 0
 
         Promise.all(allDone).then(() => {
+            this.scroll = new Scroll()
             this.addImages()
             this.setPosition()
 
             this.resize()
             this.setupResize()
-            this.addObjects()
+            // this.addObjects()
             this.render()
+
+            // window.addEventListener('scroll', () => {
+            //     this.currentScroll = window.scrollY
+            //     this.setPosition()
+            // })
         })
     }
 
@@ -115,7 +123,8 @@ export default class Sketch {
 
     setPosition() {
         this.imageStore.forEach((o) => {
-            o.mesh.position.y = -o.top + this.height / 2 - o.height / 2
+            o.mesh.position.y =
+                this.currentScroll - o.top + this.height / 2 - o.height / 2
             o.mesh.position.x = o.left - this.width / 2 + o.width / 2
         })
     }
@@ -142,9 +151,14 @@ export default class Sketch {
 
     render() {
         this.time += 0.05
-        this.mesh.rotation.x = this.time / 2000
-        this.mesh.rotation.y = this.time / 1000
-        this.material.uniforms.time.value = this.time
+
+        this.scroll.render()
+        this.currentScroll = this.scroll.scrollToRender()
+        this.setPosition()
+
+        // this.mesh.rotation.x = this.time / 2000
+        // this.mesh.rotation.y = this.time / 1000
+        // this.material.uniforms.time.value = this.time
         this.renderer.render(this.scene, this.camera)
         window.requestAnimationFrame(this.render.bind(this))
     }
