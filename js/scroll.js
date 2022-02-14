@@ -9,7 +9,6 @@ export default class Scroll{
     constructor(){
         this.DOM = { main: document.querySelector("main") };
         // the scrollable element
-        
         // we translate this element when scrolling (y-axis)
         this.DOM.scrollable = this.DOM.main.querySelector("div[data-scroll]");
         this.docScroll = 0;
